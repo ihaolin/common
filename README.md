@@ -27,4 +27,6 @@
         <version>2.4.2</version>
     </dependency>
 	```
-        
++ 引用该组件的项目:
+	
+	+ [微信公众号组件Wechat](https://github.com/ihaolin/wechat);        
