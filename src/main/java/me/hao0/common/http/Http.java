@@ -28,7 +28,7 @@ public class Http {
 
     private Map<String, String> headers = Collections.emptyMap();
 
-    private Map<String, Object> params = Collections.emptyMap();
+    private Map<String, ?> params = Collections.emptyMap();
 
     /**
      * 请求body
@@ -80,7 +80,7 @@ public class Http {
         return this;
     }
 
-    public Http params(Map<String, Object> params){
+    public Http params(Map<String, ?> params){
         this.params = params;
         return this;
     }

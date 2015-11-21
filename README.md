@@ -9,7 +9,7 @@
 	<dependency>
         <groupId>me.hao0</groupId>
         <artifactId>common</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </dependency>
 	```
 	
@@ -27,6 +27,4 @@
         <version>2.4.2</version>
     </dependency>
 	```
-+ 引用该组件的项目:
-	
-	+ [微信公众号组件Wechat](https://github.com/ihaolin/wechat);        
+        

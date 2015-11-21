@@ -39,4 +39,12 @@ public class Page<T> implements Serializable {
     public void setData(List<T> data) {
         this.data = data;
     }
+
+    @Override
+    public String toString() {
+        return "Page{" +
+                "total=" + total +
+                ", data=" + data +
+                '}';
+    }
 }
