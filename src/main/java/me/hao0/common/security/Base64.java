@@ -1,6 +1,6 @@
 package me.hao0.common.security;
 
-public final class Base64 {
+class Base64 {
 
     static private final int     BASELENGTH           = 128;
     static private final int     LOOKUPLENGTH         = 64;

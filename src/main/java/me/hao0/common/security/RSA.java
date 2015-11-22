@@ -1,117 +1,287 @@
 package me.hao0.common.security;
 
 import me.hao0.common.exception.SecurityException;
-
 import javax.crypto.Cipher;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
+import java.io.UnsupportedEncodingException;
+import java.security.*;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * RSA
+ * RSA Util
+ * Author: haolin
+ * On: 12/1/14
  */
 public class RSA {
 
-    public static final String SIGN_ALGORITHMS = "SHA1WithRSA";
+    /**
+     * encrypt algorithm
+     */
+    public static final String KEY_ALGORITHM = "RSA";
 
     /**
-     * 签名(先转为PKCS8)
-     * @param signing 待签名字符串
-     * @param privateKey 私钥
-     * @param charset 编码
-     * @return 签名后的字符串
+     * signature algorithm
      */
-    public static String sign(String signing, String privateKey, String charset) {
-        try {
-            PKCS8EncodedKeySpec priPKCS8 = new PKCS8EncodedKeySpec(Base64.decode(privateKey));
-            KeyFactory keyf = KeyFactory.getInstance("RSA");
-            PrivateKey priKey = keyf.generatePrivate(priPKCS8);
+    public static final String SIGNATURE_ALGORITHM = "SHA1WithRSA";
 
-            Signature signature = Signature.getInstance(SIGN_ALGORITHMS);
+    /**
+     * public key map key
+     */
+    private static final String PUBLIC_KEY = "RSAPublicKey";
+
+    /**
+     * private key map key
+     */
+    private static final String PRIVATE_KEY = "RSAPrivateKey";
+
+    /**
+     * public/private key size
+     */
+    private static final Integer KEY_SIZE = 1024;
+
+    /**
+     * init a public/private key pair
+     */
+    public static Map<String, Object> initKey() throws Exception {
+        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(KEY_ALGORITHM);
+        keyPairGen.initialize(KEY_SIZE);
+        KeyPair keyPair = keyPairGen.generateKeyPair();
+        // get public key
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+        // get private key
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+        Map<String, Object> keyMap = new HashMap<String, Object>(2);
+        keyMap.put(PUBLIC_KEY, publicKey);
+        keyMap.put(PRIVATE_KEY, privateKey);
+        return keyMap;
+    }
+    /**
+     * generate signed data with private key
+     * @param signing original data
+     * @param privateKey selves' private key
+     * @param charset 字符编码
+     * @return signed data
+     */
+    public static String sign(String signing, String privateKey, String charset){
+        try {
+            return sign(signing.getBytes(charset), privateKey);
+        } catch (UnsupportedEncodingException e) {
+            throw new SecurityException(e);
+        }
+    }
+
+    /**
+     * generate signed data with private key
+     * @param data original data
+     * @param privateKey selves' private key
+     * @return signed data
+     */
+    public static String sign(byte[] data, String privateKey){
+        try {
+            // decode private key with Base64
+            byte[] keyBytes = base64Decode(privateKey);
+
+            // construct PKCS8EncodedKeySpec obejct
+            PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
+
+            // get key factory of KEY_ALGORITHM
+            KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+
+            // generate PrivateKey object
+            PrivateKey priKey = keyFactory.generatePrivate(pkcs8KeySpec);
+
+            // sign data with private key and SIGNATURE_ALGORITHM algorithm
+            Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
             signature.initSign(priKey);
-            signature.update(signing.getBytes(charset));
-            return Base64.encode(signature.sign());
+            signature.update(data);
+
+            // encode signed data with Base64
+            return base64Encode(signature.sign());
+
         } catch (Exception e) {
             throw new SecurityException(e);
         }
     }
 
     /**
-     * RSA验签名检查
-     * @param signing 待签名数据
-     * @param signed 签名值
-     * @param publicKey 公钥
-     * @param charset  编码格式
-     * @return 布尔值
+     * verify signed data with public key
+     * @param signing original data
+     * @param signed signed data
+     * @param publicKey public key
+     * @return true if verify successfully, or false
      */
-    public static Boolean verify(String signing, String signed, String publicKey, String charset) {
+    public static boolean verify(String signing, String signed, String publicKey, String charset) {
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            byte[] encodedKey = Base64.decode(publicKey);
-            PublicKey pubKey = keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
-            Signature signature = Signature.getInstance(SIGN_ALGORITHMS);
+            return verify(signing.getBytes(charset), publicKey, signed);
+        } catch (UnsupportedEncodingException e) {
+            throw new SecurityException(e);
+        }
+    }
+
+    /**
+     * verify signed data with public key
+     * @param data original data
+     * @param signed signed data
+     * @param publicKey others' public key
+     * @return true if verify successfully, or false
+     */
+    public static boolean verify(byte[] data, String signed, String publicKey) {
+        try {
+            // decode public key with Base64
+            byte[] keyBytes = base64Decode(publicKey);
+
+            // construct X509EncodedKeySpec object
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+
+            // KEY_ALGORITHM
+            KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+
+            // get key factory of KEY_ALGORITHM
+            PublicKey pubKey = keyFactory.generatePublic(keySpec);
+
+            // sign data with public key and SIGNATURE_ALGORITHM algorithm
+            Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
             signature.initVerify(pubKey);
-            signature.update(signing.getBytes(charset));
-            return signature.verify(Base64.decode(signed));
-        } catch (Exception e) {
+            signature.update(data);
+
+            // 验证签名是否正常
+            return signature.verify(base64Decode(signed));
+        } catch (Exception e){
             throw new SecurityException(e);
         }
     }
 
     /**
-     * 解密
-     * @param decrypting 待解密文
-     * @param priKey 私钥
-     * @param inpuCharset 编码格式
-     * @return 解密后的字符串
+     * decrypt data with private key
+     * @param data encrypted data
+     * @param key private key
+     * @return decrypted data
+     * @throws Exception
      */
-    public static String decrypt(String decrypting, String priKey, String inpuCharset) throws Exception {
-        PrivateKey prikey = getPrivateKey(priKey);
+    public static byte[] decryptByPrivateKey(byte[] data, String key)
+            throws Exception {
+        // decode private key with Base64
+        byte[] keyBytes = base64Decode(key);
 
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.DECRYPT_MODE, prikey);
+        // get PKCS8EncodedKeySpec object
+        PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+        Key privateKey = keyFactory.generatePrivate(pkcs8KeySpec);
 
-        InputStream ins = new ByteArrayInputStream(Base64.decode(decrypting));
-        ByteArrayOutputStream writer = new ByteArrayOutputStream();
-        //rsa解密的字节大小最多是128，将需要解密的内容，按128位拆开解密
-        byte[] buf = new byte[128];
-        int bufl;
-
-        while ((bufl = ins.read(buf)) != -1) {
-            byte[] block;
-
-            if (buf.length == bufl) {
-                block = buf;
-            } else {
-                block = new byte[bufl];
-                System.arraycopy(buf, 0, block, 0, bufl);
-            }
-            writer.write(cipher.doFinal(block));
-        }
-        return new String(writer.toByteArray(), inpuCharset);
+        // decrypt data with private key
+        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        return cipher.doFinal(data);
     }
 
     /**
-     * 得到私钥
-     * @param key 密钥字符串（经过base64编码）
-     * @return 私钥
+     * decrypt data with public key
+     * @param data encrypted data
+     * @param key public key
+     * @return decrypted data
+     * @throws Exception
      */
-    public static PrivateKey getPrivateKey(String key) {
-        try {
-            byte[] keyBytes;
-            keyBytes = Base64.decode(key);
-            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-            return privateKey;
-        } catch (Exception e) {
-            throw new SecurityException(e);
-        }
+    public static byte[] decryptByPublicKey(byte[] data, String key)
+            throws Exception {
+        // decode public key with Base64
+        byte[] keyBytes = base64Decode(key);
+
+        // construct X509EncodedKeySpec object
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+        Key publicKey = keyFactory.generatePublic(x509KeySpec);
+
+        // decrypt data with public key
+        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+        cipher.init(Cipher.DECRYPT_MODE, publicKey);
+        return cipher.doFinal(data);
+    }
+
+    /**
+     * encrypt data with public key
+     * @param data original data
+     * @param key public key
+     * @return encrypted data
+     * @throws Exception
+     */
+    public static byte[] encryptByPublicKey(byte[] data, String key)
+            throws Exception {
+        // decode public key with Base64
+        byte[] keyBytes = base64Decode(key);
+
+        // construct X509EncodedKeySpec data
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+        Key publicKey = keyFactory.generatePublic(x509KeySpec);
+
+        // encrypt data with public key
+        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        return cipher.doFinal(data);
+    }
+
+    /**
+     * encrypt data with private key
+     * @param data original data
+     * @param key private key
+     * @return encrypted data
+     * @throws Exception
+     */
+    public static byte[] encryptByPrivateKey(byte[] data, String key)
+            throws Exception {
+        // decode private key with Base64
+        byte[] keyBytes = base64Decode(key);
+
+        // construct PKCS8EncodedKeySpec data
+        PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+        Key privateKey = keyFactory.generatePrivate(pkcs8KeySpec);
+
+        // encrypt data with private key
+        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+        cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+        return cipher.doFinal(data);
+    }
+
+    /**
+     * get encoded private key
+     */
+    public static String getPrivateKey(Map<String, Object> keyMap)
+            throws Exception {
+        Key key = (Key) keyMap.get(PRIVATE_KEY);
+        return base64Encode(key.getEncoded());
+    }
+
+    /**
+     * get encoded public key
+     */
+    public static String getPublicKey(Map<String, Object> keyMap)
+            throws Exception {
+        Key key = (Key) keyMap.get(PUBLIC_KEY);
+        return base64Encode(key.getEncoded());
+    }
+
+    /**
+     * encode with Base64
+     * @param key key
+     * @return encoded key
+     * @throws Exception
+     */
+    public static String base64Encode(byte[] key) throws Exception {
+        return Base64.encode(key);
+    }
+
+    /**
+     * decode with Base64
+     * @param key key
+     * @return decoded key
+     * @throws Exception
+     */
+    public static byte[] base64Decode(String key) throws Exception {
+        return Base64.decode(key);
     }
 }

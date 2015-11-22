@@ -15,7 +15,7 @@ import java.io.InputStream;
  * Email: haolin.h0@gmail.com
  * Date: 9/11/15
  */
-public class Xmls {
+public class XmlReaders {
 
     private static DocumentBuilder builder;
 
@@ -29,14 +29,14 @@ public class Xmls {
 
     private Document document;
 
-    private Xmls(){}
+    private XmlReaders(){}
 
-    public static Xmls create(String xml){
+    public static XmlReaders create(String xml){
         return create(new ByteArrayInputStream(xml.getBytes()));
     }
 
-    public static Xmls create(InputStream inputStream){
-        Xmls readers = new Xmls();
+    public static XmlReaders create(InputStream inputStream){
+        XmlReaders readers = new XmlReaders();
         try {
             readers.document = builder.parse(inputStream);
         } catch (Exception e) {
