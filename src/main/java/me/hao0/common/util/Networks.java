@@ -95,8 +95,8 @@ public class Networks {
     /**
      * 把整数分为4个字节，通过右移位得到IP地址中4个点分段的值
      *
-     * @param ipNum
-     * @return
+     * @param ipNum ip int value
+     * @return ip str
      */
     public static String num2Ip(int ipNum) {
         return ((ipNum >> 24) & 0xFF) + "." + ((ipNum >> 16) & 0xFF) + "." + ((ipNum >> 8) & 0xFF) + "." + (ipNum & 0xFF);

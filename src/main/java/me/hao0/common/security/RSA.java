@@ -160,7 +160,7 @@ public class RSA {
      * @param data encrypted data
      * @param key private key
      * @return decrypted data
-     * @throws Exception
+     * @throws Exception exception
      */
     public static byte[] decryptByPrivateKey(byte[] data, String key)
             throws Exception {
@@ -183,7 +183,7 @@ public class RSA {
      * @param data encrypted data
      * @param key public key
      * @return decrypted data
-     * @throws Exception
+     * @throws Exception exception
      */
     public static byte[] decryptByPublicKey(byte[] data, String key)
             throws Exception {
@@ -206,7 +206,7 @@ public class RSA {
      * @param data original data
      * @param key public key
      * @return encrypted data
-     * @throws Exception
+     * @throws Exception exception
      */
     public static byte[] encryptByPublicKey(byte[] data, String key)
             throws Exception {
@@ -229,7 +229,7 @@ public class RSA {
      * @param data original data
      * @param key private key
      * @return encrypted data
-     * @throws Exception
+     * @throws Exception exception
      */
     public static byte[] encryptByPrivateKey(byte[] data, String key)
             throws Exception {
@@ -249,6 +249,8 @@ public class RSA {
 
     /**
      * get encoded private key
+     * @param keyMap key pair
+     * @return encoded private key
      */
     public static String getPrivateKey(Map<String, Object> keyMap)
             throws Exception {
@@ -258,6 +260,8 @@ public class RSA {
 
     /**
      * get encoded public key
+     * @param keyMap key pair
+     * @return encoded public key
      */
     public static String getPublicKey(Map<String, Object> keyMap)
             throws Exception {
@@ -269,7 +273,7 @@ public class RSA {
      * encode with Base64
      * @param key key
      * @return encoded key
-     * @throws Exception
+     * @throws Exception exception
      */
     public static String base64Encode(byte[] key) throws Exception {
         return Base64.encode(key);
@@ -279,7 +283,7 @@ public class RSA {
      * decode with Base64
      * @param key key
      * @return decoded key
-     * @throws Exception
+     * @throws Exception exception
      */
     public static byte[] base64Decode(String key) throws Exception {
         return Base64.decode(key);
