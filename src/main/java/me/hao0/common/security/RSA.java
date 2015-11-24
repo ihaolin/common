@@ -116,7 +116,7 @@ public class RSA {
      */
     public static boolean verify(String signing, String signed, String publicKey, String charset) {
         try {
-            return verify(signing.getBytes(charset), publicKey, signed);
+            return verify(signing.getBytes(charset), signed, publicKey);
         } catch (UnsupportedEncodingException e) {
             throw new SecurityException(e);
         }
