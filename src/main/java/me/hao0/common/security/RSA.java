@@ -3,7 +3,14 @@ package me.hao0.common.security;
 import me.hao0.common.exception.SecurityException;
 import javax.crypto.Cipher;
 import java.io.UnsupportedEncodingException;
-import java.security.*;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -46,18 +53,22 @@ public class RSA {
     /**
      * init a public/private key pair
      */
-    public static Map<String, Object> initKey() throws Exception {
-        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(KEY_ALGORITHM);
-        keyPairGen.initialize(KEY_SIZE);
-        KeyPair keyPair = keyPairGen.generateKeyPair();
-        // get public key
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        // get private key
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        Map<String, Object> keyMap = new HashMap<String, Object>(2);
-        keyMap.put(PUBLIC_KEY, publicKey);
-        keyMap.put(PRIVATE_KEY, privateKey);
-        return keyMap;
+    public static Map<String, Object> initKey(){
+        try {
+            KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(KEY_ALGORITHM);
+            keyPairGen.initialize(KEY_SIZE);
+            KeyPair keyPair = keyPairGen.generateKeyPair();
+            // get public key
+            RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+            // get private key
+            RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+            Map<String, Object> keyMap = new HashMap<>(2);
+            keyMap.put(PUBLIC_KEY, publicKey);
+            keyMap.put(PRIVATE_KEY, privateKey);
+            return keyMap;
+        } catch (NoSuchAlgorithmException e) {
+            throw new SecurityException(e);
+        }
     }
     /**
      * generate signed data with private key
@@ -112,6 +123,7 @@ public class RSA {
      * @param signing original data
      * @param signed signed data
      * @param publicKey public key
+     * @param charset charset
      * @return true if verify successfully, or false
      */
     public static boolean verify(String signing, String signed, String publicKey, String charset) {
@@ -160,22 +172,24 @@ public class RSA {
      * @param data encrypted data
      * @param key private key
      * @return decrypted data
-     * @throws Exception exception
      */
-    public static byte[] decryptByPrivateKey(byte[] data, String key)
-            throws Exception {
-        // decode private key with Base64
-        byte[] keyBytes = base64Decode(key);
+    public static byte[] decryptByPrivateKey(byte[] data, String key) {
+        try {
+            // decode private key with Base64
+            byte[] keyBytes = base64Decode(key);
 
-        // get PKCS8EncodedKeySpec object
-        PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
-        Key privateKey = keyFactory.generatePrivate(pkcs8KeySpec);
+            // get PKCS8EncodedKeySpec object
+            PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+            Key privateKey = keyFactory.generatePrivate(pkcs8KeySpec);
 
-        // decrypt data with private key
-        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        return cipher.doFinal(data);
+            // decrypt data with private key
+            Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            return cipher.doFinal(data);
+        } catch (Exception e){
+            throw new SecurityException(e);
+        }
     }
 
     /**
@@ -183,22 +197,24 @@ public class RSA {
      * @param data encrypted data
      * @param key public key
      * @return decrypted data
-     * @throws Exception exception
      */
-    public static byte[] decryptByPublicKey(byte[] data, String key)
-            throws Exception {
-        // decode public key with Base64
-        byte[] keyBytes = base64Decode(key);
+    public static byte[] decryptByPublicKey(byte[] data, String key) {
+        try {
+            // decode public key with Base64
+            byte[] keyBytes = base64Decode(key);
 
-        // construct X509EncodedKeySpec object
-        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
-        Key publicKey = keyFactory.generatePublic(x509KeySpec);
+            // construct X509EncodedKeySpec object
+            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+            Key publicKey = keyFactory.generatePublic(x509KeySpec);
 
-        // decrypt data with public key
-        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
-        cipher.init(Cipher.DECRYPT_MODE, publicKey);
-        return cipher.doFinal(data);
+            // decrypt data with public key
+            Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+            cipher.init(Cipher.DECRYPT_MODE, publicKey);
+            return cipher.doFinal(data);
+        } catch (Exception e){
+            throw new SecurityException(e);
+        }
     }
 
     /**
@@ -206,22 +222,24 @@ public class RSA {
      * @param data original data
      * @param key public key
      * @return encrypted data
-     * @throws Exception exception
      */
-    public static byte[] encryptByPublicKey(byte[] data, String key)
-            throws Exception {
-        // decode public key with Base64
-        byte[] keyBytes = base64Decode(key);
+    public static byte[] encryptByPublicKey(byte[] data, String key){
+        try {
+            // decode public key with Base64
+            byte[] keyBytes = base64Decode(key);
 
-        // construct X509EncodedKeySpec data
-        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
-        Key publicKey = keyFactory.generatePublic(x509KeySpec);
+            // construct X509EncodedKeySpec data
+            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+            Key publicKey = keyFactory.generatePublic(x509KeySpec);
 
-        // encrypt data with public key
-        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        return cipher.doFinal(data);
+            // encrypt data with public key
+            Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            return cipher.doFinal(data);
+        } catch (Exception e){
+            throw new SecurityException(e);
+        }
     }
 
     /**
@@ -229,22 +247,24 @@ public class RSA {
      * @param data original data
      * @param key private key
      * @return encrypted data
-     * @throws Exception exception
      */
-    public static byte[] encryptByPrivateKey(byte[] data, String key)
-            throws Exception {
-        // decode private key with Base64
-        byte[] keyBytes = base64Decode(key);
+    public static byte[] encryptByPrivateKey(byte[] data, String key){
+        try {
+            // decode private key with Base64
+            byte[] keyBytes = base64Decode(key);
 
-        // construct PKCS8EncodedKeySpec data
-        PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
-        Key privateKey = keyFactory.generatePrivate(pkcs8KeySpec);
+            // construct PKCS8EncodedKeySpec data
+            PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+            Key privateKey = keyFactory.generatePrivate(pkcs8KeySpec);
 
-        // encrypt data with private key
-        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
-        cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-        return cipher.doFinal(data);
+            // encrypt data with private key
+            Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+            cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+            return cipher.doFinal(data);
+        } catch (Exception e){
+            throw new SecurityException(e);
+        }
     }
 
     /**
@@ -252,8 +272,7 @@ public class RSA {
      * @param keyMap key pair
      * @return encoded private key
      */
-    public static String getPrivateKey(Map<String, Object> keyMap)
-            throws Exception {
+    public static String getPrivateKey(Map<String, Object> keyMap) {
         Key key = (Key) keyMap.get(PRIVATE_KEY);
         return base64Encode(key.getEncoded());
     }
@@ -263,8 +282,7 @@ public class RSA {
      * @param keyMap key pair
      * @return encoded public key
      */
-    public static String getPublicKey(Map<String, Object> keyMap)
-            throws Exception {
+    public static String getPublicKey(Map<String, Object> keyMap) {
         Key key = (Key) keyMap.get(PUBLIC_KEY);
         return base64Encode(key.getEncoded());
     }
@@ -273,9 +291,8 @@ public class RSA {
      * encode with Base64
      * @param key key
      * @return encoded key
-     * @throws Exception exception
      */
-    public static String base64Encode(byte[] key) throws Exception {
+    public static String base64Encode(byte[] key){
         return Base64.encode(key);
     }
 
@@ -283,9 +300,8 @@ public class RSA {
      * decode with Base64
      * @param key key
      * @return decoded key
-     * @throws Exception exception
      */
-    public static byte[] base64Decode(String key) throws Exception {
+    public static byte[] base64Decode(String key) {
         return Base64.decode(key);
     }
 }
