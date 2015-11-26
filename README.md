@@ -9,7 +9,7 @@
 	<dependency>
         <groupId>me.hao0</groupId>
         <artifactId>common</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
     </dependency>
 	```
 	

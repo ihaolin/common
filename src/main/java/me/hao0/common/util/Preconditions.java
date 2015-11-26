@@ -3,6 +3,9 @@ package me.hao0.common.util;
 import java.util.Collection;
 
 public final class Preconditions {
+
+    private static final String CAN_NOT_NULL_EMPTY = " can't be null or empty";
+
     private Preconditions() {
     }
 
@@ -350,15 +353,15 @@ public final class Preconditions {
         return builder.toString();
     }
 
-    public static void checkNotNullAndEmpty(String checking, Object errorMessage){
+    public static void checkNotNullAndEmpty(String checking, String field){
         if (checking == null || "".equals(checking)){
-            throw new IllegalArgumentException(String.valueOf(errorMessage));
+            throw new IllegalArgumentException(field + CAN_NOT_NULL_EMPTY);
         }
     }
 
-    public static void checkNotNullAndEmpty(Collection<?> checking, Object errorMessage){
+    public static void checkNotNullAndEmpty(Collection<?> checking, String field){
         if (checking == null || checking.isEmpty()){
-            throw new IllegalArgumentException(String.valueOf(errorMessage));
+            throw new IllegalArgumentException(field + CAN_NOT_NULL_EMPTY);
         }
     }
 }
