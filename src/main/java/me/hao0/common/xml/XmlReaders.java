@@ -11,9 +11,11 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
+ * 简陋的XML读取器
  * Author: haolin
  * Email: haolin.h0@gmail.com
  * Date: 9/11/15
+ * @since 1.0.0
  */
 public class XmlReaders {
 
