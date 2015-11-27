@@ -2,6 +2,7 @@ package me.hao0.common.date;
 
 import me.hao0.common.util.Strings;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -52,12 +53,22 @@ public class Dates {
     }
 
     /**
-     * 转换日期字符串为日期对象
+     * 转换日期字符串为日期对象(默认格式: yyyy-MM-dd HH:mm:ss)
      * @param dateStr 日期字符串
      * @return 日期对象
      */
     public static Date toDate(String dateStr){
-        return DateTime.parse(dateStr).toDate();
+        return toDate(dateStr, DEFAULT_DATE_FORMAT);
+    }
+
+    /**
+     * 转换日期即字符串为Date对象
+     * @param dateStr 日期字符串
+     * @param pattern 日期格式
+     * @return 日期对象
+     */
+    public static Date toDate(String dateStr, String pattern){
+        return DateTimeFormat.forPattern(pattern).parseDateTime(dateStr).toDate();
     }
 
     /**
