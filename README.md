@@ -9,7 +9,7 @@
 	<dependency>
         <groupId>me.hao0</groupId>
         <artifactId>common</artifactId>
-        <version>1.0.8</version>
+        <version>1.0.9</version>
     </dependency>
 	```
 	
@@ -43,9 +43,8 @@
 	+ [RSA](src/main/java/me/hao0/common/secruity/RSA.java): RSA工具；
 	+ [Fields](src/main/java/me/hao0/common/util/Fields.java): 反射工具；
 	+ [Networks](src/main/java/me/hao0/common/util/Networks.java): 网络工具；
-	+ [Preconditions](src/main/java/me/hao0/common/util/Preconditions.java): 扩展guava的Preconditions工具；
+	+ [Preconditions](src/main/java/me/hao0/common/util/Preconditions.java): 参数校验工具；
 	+ [Strings](src/main/java/me/hao0/common/util/Strings.java): 字符串工具；
-	+ [Xmls](src/main/java/me/hao0/common/xml/Xmls.java): Xml工具；
-
+	+ [XmlReaders](src/main/java/me/hao0/common/xml/XmlReaders.java), [XmlWriters](src/main/java/me/hao0/common/xml/XmlWriters.java): Xml工具；
 
       

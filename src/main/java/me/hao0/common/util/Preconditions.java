@@ -6,6 +6,10 @@ public final class Preconditions {
 
     private static final String CAN_NOT_NULL_EMPTY = " can't be null or empty";
 
+    private static final String MUST_GT_0 = " must > 0";
+
+    private static final String MUST_LT_0 = " must < 0";
+
     private Preconditions() {
     }
 
@@ -362,6 +366,18 @@ public final class Preconditions {
     public static void checkNotNullAndEmpty(Collection<?> checking, String field){
         if (checking == null || checking.isEmpty()){
             throw new IllegalArgumentException(field + CAN_NOT_NULL_EMPTY);
+        }
+    }
+
+    public static void checkPositive(Number number, String field){
+        if (number == null || number.intValue() < 0){
+            throw new IllegalArgumentException(field + MUST_GT_0);
+        }
+    }
+
+    public static void checkNegative(Number number, String field){
+        if (number == null || number.intValue() > 0){
+            throw new IllegalArgumentException(field + MUST_LT_0);
         }
     }
 }
