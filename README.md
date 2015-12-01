@@ -9,7 +9,7 @@
 	<dependency>
         <groupId>me.hao0</groupId>
         <artifactId>common</artifactId>
-        <version>1.0.9</version>
+        <version>1.1.0</version>
     </dependency>
 	```
 	
@@ -37,6 +37,7 @@
 
 	+ [Dates](src/main/java/me/hao0/common/date/Dates.java): 日期工具；
 	+ [Http](src/main/java/me/hao0/common/http/Http.java): Http请求工具；
+	+ [Https](src/main/java/me/hao0/common/http/Https.java): Https请求工具；
 	+ [Jsons](src/main/java/me/hao0/common/json/Jsons.java): Json处理工具；
 	+ [Page](src/main/java/me/hao0/common/model/Page.java): 分页对象；
 	+ [MD5](src/main/java/me/hao0/common/security/MD5.java): MD5工具；
