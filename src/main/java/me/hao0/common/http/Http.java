@@ -281,9 +281,4 @@ public class Http {
             throw new HttpException(e);
         }
     }
-
-    private static enum HttpMethod {
-        GET, POST, PUT, DELETE
-    }
-
 }
