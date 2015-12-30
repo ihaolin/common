@@ -60,10 +60,24 @@ public abstract class Fields {
      * @param <T> generic type
      * @return the field value
      */
-    @SuppressWarnings("unchecked")
     public static <T> T get(Object target, String name) {
         try {
-            Field field = target.getClass().getDeclaredField(name);
+            return get(target, target.getClass().getDeclaredField(name));
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * get field of target object
+     * @param target target object
+     * @param field field
+     * @param <T> generic type
+     * @return the field value
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T get(Object target, Field field) {
+        try {
             long fieldOffset = unsafe.objectFieldOffset(field);
             return (T)unsafe.getObject(target, fieldOffset);
         } catch (Exception e){
