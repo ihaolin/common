@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * 简陋的XML读取器
@@ -34,7 +35,15 @@ public class XmlReaders {
     private XmlReaders(){}
 
     public static XmlReaders create(String xml){
-        return create(new ByteArrayInputStream(xml.getBytes()));
+        return create(xml, "UTF-8");
+    }
+
+    public static XmlReaders create(String xml, String encode){
+        try {
+            return create(new ByteArrayInputStream(xml.getBytes(encode)));
+        } catch (UnsupportedEncodingException e) {
+            throw new XmlException(e);
+        }
     }
 
     public static XmlReaders create(InputStream inputStream){
