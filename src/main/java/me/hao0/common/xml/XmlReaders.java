@@ -24,7 +24,10 @@ public class XmlReaders {
 
     static {
         try {
-            builder =  DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            // 禁用XML 外部实体注入
+            documentBuilderFactory.setExpandEntityReferences(false);
+            builder =  documentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             throw new XmlException("init xml failed");
         }
