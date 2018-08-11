@@ -20,16 +20,6 @@ import java.io.UnsupportedEncodingException;
  */
 public class XmlReaders {
 
-    private static DocumentBuilder builder;
-
-    static {
-        try {
-            builder =  DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new XmlException("init xml failed");
-        }
-    }
-
     private Document document;
 
     private XmlReaders(){}
@@ -49,7 +39,7 @@ public class XmlReaders {
     public static XmlReaders create(InputStream inputStream){
         XmlReaders readers = new XmlReaders();
         try {
-            readers.document = builder.parse(inputStream);
+            readers.document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
         } catch (Exception e) {
             throw new XmlException("Xmls create fail", e);
         }
